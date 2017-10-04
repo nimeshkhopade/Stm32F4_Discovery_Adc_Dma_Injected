@@ -63,7 +63,7 @@ int main(void) {
 	
 	//ADC1->SQR2 |= 6 << 0|7 << 5; //put channel number (CH6, CH7)
 	
-	ADC1->SQR1 |= 7 << 20; //L = 8 conversions(n-1) (8 ADC conversions)
+	ADC1->SQR1 |= 3 << 20; //L = 8 conversions(n-1) (8 ADC conversions)
 	
 	ADC1->JSQR |= 4 << 0 | /*5 << 5 | 6 << 10 | 7 << 15 |*/ 0 << 20; //JL=4
 	
@@ -76,14 +76,14 @@ int main(void) {
 	DMA2_Stream4->CR =  0 << 6 | 1 << 8 | 1 << 10 | 2 << 11 | 2 << 13 | 2 << 16 | 0 << 25;  //DIR,CIRC,MINC,PSIZE,MSIZE,PL,CHSEL
 	DMA2_Stream4->FCR |= 0 << 2 ; //| 3 << 0; // Direct mode
 	DMA2_Stream4->CR |= 1 << 0; // start stream4
-	
+	/*
 	DMA2_Stream0->PAR |= (uint32_t)&ADC1->JDR1;
 	DMA2_Stream0->M0AR |= (uint32_t)&jadc1;
 	DMA2_Stream0->NDTR |= 4;
 	DMA2_Stream0->CR =  0 << 6 | 1 << 8 | 1 << 9 | 1 << 10 | 2 << 11 | 2 << 13 | 1 << 16 | 0 << 25;  //DIR,CIRC,PINC,MINC,PSIZE,MSIZE,PL,CHSEL
 	DMA2_Stream0->FCR |= 0 << 2 ; //| 3 << 0; // Direct mode
 	DMA2_Stream0->CR |= 1 << 0; // start stream0
-	
+	*/
 	ADC1->CR2 |= ADC_CR2_SWSTART;  //start conversion regular
 	ADC1->CR2 |= ADC_CR2_JSWSTART; //injected conversion start
 	
@@ -94,12 +94,12 @@ int main(void) {
 	/**************************************************************************/
 	
 	while(1) {
-		/*while(!ADC_SR_JEOC);
+		while(!ADC_SR_JEOC);
 		jadc1[0] = ADC1->JDR1;
-		ADC1->SR |= 0 << 2;
 		jadc1[1] = ADC1->JDR2;
 		jadc1[2] = ADC1->JDR3;
-		jadc1[3] = ADC1->JDR4;*/
+		jadc1[3] = ADC1->JDR4;
+		ADC1->SR |= 0 << 2;
 		if(DMA2->HISR == 0x00000030) {
 			DMA2->HIFCR = 1 << 5 | 1 << 4;  // Clear DMA Transfer Complete Flag
 		} 
