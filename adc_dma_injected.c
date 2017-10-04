@@ -86,6 +86,7 @@ int main(void) {
 	
 	ADC1->CR2 |= ADC_CR2_SWSTART;  //start conversion regular
 	ADC1->CR2 |= ADC_CR2_JSWSTART; //injected conversion start
+	
 	/**************************************************************************/
 	/* TO GET ADC READINGS CONTINOUSLY WITHOUT SETTING THE CONT BIT IN ADC->CR2
 	REGISTER COPY AND PASTE ABOVE LINE IN WHILE LOOP BUT MAKE SURE TO KEEP 
