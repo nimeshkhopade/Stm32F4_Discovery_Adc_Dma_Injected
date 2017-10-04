@@ -1,5 +1,5 @@
 #include <stm32f4xx.h>
-
+float temp = 0.0;
 int main(void) {
 	/* Flash settings (see RM0090 rev9, p80) */
 
@@ -53,17 +53,21 @@ int main(void) {
 	
 	ADC->CCR |= 1 << 16; //ADCPRE is set to 4 i.e APB2 / 4 = 21MHz for ADCCLK
 	
-	//ADC1->SMPR2 |= 6 << 0 | 6 << 3 | 6 << 6; //Sampling time set to 144 cycles for channel 0
+	ADC1->SMPR2 |= 6 << 0 | 6 << 3 | 6 << 6; //Sampling time set to 144 cycles for channel 0
+	
+	ADC1->SMPR1 |= 6 << 18;
+	
+	ADC->CCR |= 1 << 23;
 	
 	ADC1->CR1 |= 0 << 24 | 1 << 10 | 1 << 8; //12bit_Resolution|JAUTO|Scan_Mode
 	
 	ADC1->CR2 = 1 << 0 | 1 << 1 | 1 << 10 | 1 << 8 | 1 << 9; // ADON, CONT, EOCS, DMA_ENABLE, DDS
 	
-	ADC1->SQR3 |= 0 << 0 |1 << 5|2 << 10| 3 << 15;//|4 << 20|5 << 25; // put channel number (CH0, CH1, CH2, CH3, CH4, CH5)
+	ADC1->SQR3 |= 0 << 0 |1 << 5|2 << 10| 16 << 15;//|4 << 20|5 << 25; // put channel number (CH0, CH1, CH2, CH3, CH4, CH5)
 	
 	//ADC1->SQR2 |= 6 << 0|7 << 5; //put channel number (CH6, CH7)
 	
-	ADC1->SQR1 |= 3 << 20; //L = 8 conversions(n-1) (8 ADC conversions)
+	ADC1->SQR1 |= 3 << 20; //temp | L = 8 conversions(n-1) (8 ADC conversions)
 	
 	ADC1->JSQR |= 4 << 0 | /*5 << 5 | 6 << 10 | 7 << 15 |*/ 0 << 20; //JL=4
 	
@@ -76,14 +80,7 @@ int main(void) {
 	DMA2_Stream4->CR =  0 << 6 | 1 << 8 | 1 << 10 | 2 << 11 | 2 << 13 | 2 << 16 | 0 << 25;  //DIR,CIRC,MINC,PSIZE,MSIZE,PL,CHSEL
 	DMA2_Stream4->FCR |= 0 << 2 ; //| 3 << 0; // Direct mode
 	DMA2_Stream4->CR |= 1 << 0; // start stream4
-	/*
-	DMA2_Stream0->PAR |= (uint32_t)&ADC1->JDR1;
-	DMA2_Stream0->M0AR |= (uint32_t)&jadc1;
-	DMA2_Stream0->NDTR |= 4;
-	DMA2_Stream0->CR =  0 << 6 | 1 << 8 | 1 << 9 | 1 << 10 | 2 << 11 | 2 << 13 | 1 << 16 | 0 << 25;  //DIR,CIRC,PINC,MINC,PSIZE,MSIZE,PL,CHSEL
-	DMA2_Stream0->FCR |= 0 << 2 ; //| 3 << 0; // Direct mode
-	DMA2_Stream0->CR |= 1 << 0; // start stream0
-	*/
+	
 	ADC1->CR2 |= ADC_CR2_SWSTART;  //start conversion regular
 	ADC1->CR2 |= ADC_CR2_JSWSTART; //injected conversion start
 	
@@ -103,6 +100,6 @@ int main(void) {
 		if(DMA2->HISR == 0x00000030) {
 			DMA2->HIFCR = 1 << 5 | 1 << 4;  // Clear DMA Transfer Complete Flag
 		} 
-
+		temp = ((adc1[3]-760)/2500)+25;
 	}
 }
