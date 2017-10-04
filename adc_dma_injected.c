@@ -69,7 +69,7 @@ int main(void) {
 	
 	ADC1->SQR1 |= 3 << 20; //temp | L = 8 conversions(n-1) (8 ADC conversions)
 	
-	ADC1->JSQR |= 4 << 0 | /*5 << 5 | 6 << 10 | 7 << 15 |*/ 0 << 20; //JL=4
+	ADC1->JSQR |= 4 << 0 | 5 << 5 | 6 << 10 | 7 << 15 | 3 << 20; //JL=4
 	
 	uint32_t adc1[4];
 	uint32_t jadc1[4];
